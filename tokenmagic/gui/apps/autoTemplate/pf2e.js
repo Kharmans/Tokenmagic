@@ -1,4 +1,4 @@
-import { defaultOpacity, emptyPreset } from '../../../module/constants.js';
+import { defaultOpacity, emptyPreset, TEMPLATE_TYPES } from '../../../module/constants.js';
 import { TemplateSettings } from './TemplateSettings.js';
 
 export class AutoTemplatePF2E extends TemplateSettings {
@@ -84,7 +84,7 @@ export class AutoTemplatePF2E extends TemplateSettings {
 				}
 				defaultConfig.categories[dmgType] = config;
 			}
-			Object.values(CONST.MEASURED_TEMPLATE_TYPES).forEach((tplType) => {
+			TEMPLATE_TYPES.forEach((tplType) => {
 				const config = { preset: emptyPreset, texture: null };
 				switch (dmgType.toLowerCase()) {
 					case 'acid':
@@ -155,10 +155,10 @@ export class AutoTemplatePF2E extends TemplateSettings {
 			dmgTypes[type] = { label: type.charAt(0).toUpperCase() + type.slice(1) };
 		}
 		context.dmgTypes = dmgTypes;
-		context.templateTypes = CONST.MEASURED_TEMPLATE_TYPES;
+		context.templateTypes = TEMPLATE_TYPES;
 	}
 
-	preCreateMeasuredTemplate(template) {
+	preCreateRegion(template) {
 		let hasPreset = template.hasOwnProperty('tmfxPreset');
 		if (hasPreset) {
 			return template;
@@ -179,13 +179,10 @@ function fromConfig(config, template) {
 	if (config.preset && config.preset !== '' && config.preset !== emptyPreset) {
 		o.tokenmagic.options.tmfxPreset = config.preset;
 	}
-	if (config.texture && config.texture !== '') {
-		o.tokenmagic.options.tmfxTexture = config.texture;
-	}
 	if (config.tint && config.tint !== '') {
 		o.tokenmagic.options.tmfxTint = config.tint;
 	}
-	o.tokenmagic.options.tmfxTextureAlpha = config.opacity;
+	o.tokenmagic.options.tmfxRegionOpacity = config.opacity;
 	template.updateSource({ flags: { tokenmagic: o.tokenmagic } });
 }
 
@@ -213,7 +210,7 @@ function fromCategories(categories = {}, origin, template) {
 	// this loop looks over all of them until it finds one with a valid fx preset
 	for (const trait of origin.traits) {
 		dmgSettings = categories[trait.toLowerCase()] || {};
-		config = dmgSettings[template.t];
+		config = dmgSettings[template.t]; // TODO regions have shapes not properties like .t
 
 		if (config && config.preset !== emptyPreset) {
 			break;
@@ -224,7 +221,7 @@ function fromCategories(categories = {}, origin, template) {
 	}
 	fromConfig(
 		foundry.utils.mergeObject(config, { opacity: dmgSettings.opacity, tint: dmgSettings.tint }, true, true),
-		template
+		template,
 	);
 	return true;
 }

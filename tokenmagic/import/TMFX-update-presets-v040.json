@@ -2,7 +2,8 @@
 	{
 		"name": "Spider Web 4",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "web",
@@ -49,7 +50,8 @@
 	{
 		"name": "Spider Web 5",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "web",
@@ -97,7 +99,8 @@
 	{
 		"name": "Ripples : Solar",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ripples",
@@ -118,7 +121,8 @@
 	{
 		"name": "Ripples : Shadow Sun",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ripples",
@@ -140,7 +144,8 @@
 	{
 		"name": "Ripples : Scars",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ripples",
@@ -181,7 +186,8 @@
 	{
 		"name": "Fairy Fireflies : Calm",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "globes",
@@ -205,7 +211,8 @@
 	{
 		"name": "Fairy Fireflies : Excited",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "globes",
@@ -248,7 +255,8 @@
 	{
 		"name": "Fairy Fireflies : Frenetic",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "globes",
@@ -291,7 +299,8 @@
 	{
 		"name": "Living Fluid",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "xfog",
@@ -314,7 +323,8 @@
 	{
 		"name": "Living Fluid 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "xfog",
@@ -347,7 +357,8 @@
 	{
 		"name": "Living Fluid 3",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "liquid",
@@ -373,7 +384,8 @@
 	{
 		"name": "Living Fluid 4",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "liquid",
@@ -409,7 +421,8 @@
 	{
 		"name": "Flames 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fire",
@@ -435,7 +448,8 @@
 	{
 		"name": "Flames 3",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-pure.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fire",
@@ -489,7 +503,8 @@
 	{
 		"name": "Classic Rays 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ray",
@@ -515,7 +530,8 @@
 	{
 		"name": "Fire Rays",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-pure.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ray",

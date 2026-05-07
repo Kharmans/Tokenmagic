@@ -1,4 +1,4 @@
-import { defaultOpacity, emptyPreset } from '../../../module/constants.js';
+import { defaultOpacity, emptyPreset, TEMPLATE_TYPES } from '../../../module/constants.js';
 import { TemplateSettings } from './TemplateSettings.js';
 
 export class AutoTemplateTheWitcherTRPG extends TemplateSettings {
@@ -56,7 +56,7 @@ export class AutoTemplateTheWitcherTRPG extends TemplateSettings {
 				}
 				defaultConfig.categories[meleeSkillType] = config;
 			}
-			Object.values(CONST.MEASURED_TEMPLATE_TYPES).forEach((tplType) => {
+			TEMPLATE_TYPES.forEach((tplType) => {
 				const config = { preset: emptyPreset, texture: null };
 				switch (meleeSkillType.toLowerCase()) {
 					case 'acid':
@@ -107,10 +107,10 @@ export class AutoTemplateTheWitcherTRPG extends TemplateSettings {
 			dmgTypes[type] = { label: type.charAt(0).toUpperCase() + type.slice(1) };
 		}
 		context.dmgTypes = dmgTypes;
-		context.templateTypes = CONST.MEASURED_TEMPLATE_TYPES;
+		context.templateTypes = TEMPLATE_TYPES;
 	}
 
-	preCreateMeasuredTemplate(template) {
+	preCreateRegion(template) {
 		let hasPreset = template.hasOwnProperty('tmfxPreset');
 		if (hasPreset) {
 			return template;
@@ -128,13 +128,10 @@ function fromConfig(config, templateData) {
 	if (config.preset && config.preset !== '' && config.preset !== emptyPreset) {
 		o.tokenmagic.options.tmfxPreset = config.preset;
 	}
-	if (config.texture && config.texture !== '') {
-		o.tokenmagic.options.tmfxTexture = config.texture;
-	}
 	if (config.tint && config.tint !== '') {
 		o.tokenmagic.options.tmfxTint = config.tint;
 	}
-	o.tokenmagic.options.tmfxTextureAlpha = config.opacity;
+	o.tokenmagic.options.tmfxRegionOpacity = config.opacity;
 	foundry.utils.mergeObject(templateData, { 'flags.tokenmagic': o.tokenmagic });
 }
 
@@ -167,7 +164,7 @@ function fromCategories(categories = {}, templateData) {
 
 	fromConfig(
 		foundry.utils.mergeObject(config, { opacity: dmgSettings.opacity, tint: dmgSettings.tint }, true, true),
-		templateData
+		templateData,
 	);
 	return true;
 }

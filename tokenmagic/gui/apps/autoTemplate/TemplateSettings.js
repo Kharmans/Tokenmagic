@@ -56,7 +56,7 @@ export class TemplateSettings extends HandlebarsApplicationMixin(ApplicationV2) 
 			emptyPreset,
 			presets: [
 				{ name: emptyPreset },
-				...Magic.getPresets(PresetsLibrary.TEMPLATE).sort(function (a, b) {
+				...Magic.getPresets(PresetsLibrary.REGION).sort(function (a, b) {
 					if (a.name < b.name) return -1;
 					if (a.name > b.name) return 1;
 					return 0;

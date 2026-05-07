@@ -33,7 +33,7 @@ export class PresetSearch extends HandlebarsApplicationMixin(ApplicationV2) {
 		actions: {
 			delete: PresetSearch._onDeletePreset,
 			edit: PresetSearch._onEditPreset,
-			toggleTemplates: PresetSearch._onToggleTemplates,
+			toggleRegions: PresetSearch._onToggleRegions,
 		},
 	};
 
@@ -61,10 +61,10 @@ export class PresetSearch extends HandlebarsApplicationMixin(ApplicationV2) {
 			case 'controls':
 				context.controls = [
 					{
-						action: 'toggleTemplates',
-						tooltip: game.i18n.localize('TMFX.app.searchPreset.controls.templateToggle'),
-						icon: 'fa-fw fa-solid fa-ruler-combined',
-						active: Boolean(this._templates),
+						action: 'toggleRegions',
+						tooltip: game.i18n.localize('TMFX.app.searchPreset.controls.regionToggle'),
+						icon: 'fa-regular fa-game-board',
+						active: Boolean(this._regions),
 					},
 				];
 				break;
@@ -77,7 +77,7 @@ export class PresetSearch extends HandlebarsApplicationMixin(ApplicationV2) {
 
 	async _preparePresetContext(context, options) {
 		const controlled = TokenMagic.getControlledPlaceables();
-		const library = this._templates ? PresetsLibrary.TEMPLATE : PresetsLibrary.MAIN;
+		const library = this._regions ? PresetsLibrary.REGION : PresetsLibrary.MAIN;
 
 		this._presets = TokenMagic.getPresets(library);
 
@@ -160,8 +160,8 @@ export class PresetSearch extends HandlebarsApplicationMixin(ApplicationV2) {
 		}, 200);
 	}
 
-	static _onToggleTemplates(event, element) {
-		this._templates = !this._templates;
+	static _onToggleRegions(event, element) {
+		this._regions = !this._regions;
 		this.render({ parts: ['controls', 'presets'] });
 	}
 
@@ -222,7 +222,7 @@ export class PresetEdit extends HandlebarsApplicationMixin(ApplicationV2) {
 		actions: {
 			delete: PresetSearch._onDeletePreset,
 			edit: PresetSearch._onEditPreset,
-			toggleTemplates: PresetSearch._onToggleTemplates,
+			toggleRegions: PresetSearch._onToggleRegions,
 			upload: PresetEdit._onUpload,
 		},
 	};
@@ -246,7 +246,8 @@ export class PresetEdit extends HandlebarsApplicationMixin(ApplicationV2) {
 			case 'main':
 				context.name = this._preset.name;
 				context.library = this._preset.library;
-				context.defaultTexture = this._preset.defaultTexture;
+				context.defaultColor = this._preset.defaultColor;
+				context.defaultOpacity = this._preset.defaultOpacity;
 				context.params = JSON.stringify(this._preset.params, null, 2);
 				break;
 			case 'footer':
@@ -260,12 +261,22 @@ export class PresetEdit extends HandlebarsApplicationMixin(ApplicationV2) {
 
 	static async _onSubmit(event, form, formData) {
 		const name = formData.object.name.trim();
-		const defaultTexture = formData.object.defaultTexture?.trim();
-		if (this._preset.name === name && this._preset.defaultTexture === defaultTexture) return;
+		const defaultColor = formData.object.defaultColor?.trim();
+		const defaultOpacity = formData.object.defaultOpacity;
+		if (
+			this._preset.name === name &&
+			this._preset.defaultColor === defaultColor &&
+			this._preset.defaultOpacity === defaultOpacity
+		)
+			return;
 		if (!name) return;
 
 		await TokenMagic.deletePreset({ name: this._preset.name, library: this._preset.library }, true);
-		await TokenMagic.addPreset({ name, library: this._preset.library, defaultTexture }, this._preset.params, true);
+		await TokenMagic.addPreset(
+			{ name, library: this._preset.library, defaultColor, defaultOpacity },
+			this._preset.params,
+			true,
+		);
 		if (this._parentApp.state === ApplicationV2.RENDER_STATES.RENDERED) {
 			this._parentApp.render({ parts: ['presets'] });
 		}

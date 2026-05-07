@@ -1,5 +1,6 @@
 import { TokenMagic, isTheOne, log, warn, error } from '../module/tokenmagic.js';
 import { PresetsLibrary, templatePresets } from '../fx/presets/defaultpresets.js';
+import { defaultOpacity } from '../module/constants.js';
 
 const Magic = TokenMagic();
 
@@ -13,6 +14,27 @@ export const DataVersion = {
 	V041: '0.4.1',
 	V043: '0.4.3',
 	V044: '0.4.4',
+	V050: '0.5.0',
+	V051: '0.5.1',
+};
+
+const TEXTURE_MAPPINGS = {
+	'modules/tokenmagic/fx/assets/templates/black-tone-pure.png': {
+		defaultColor: '#000000',
+		defaultOpacity: 1.0,
+	},
+	'modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png': {
+		defaultColor: '#000000',
+		defaultOpacity: 1.0,
+	},
+	'modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png': {
+		defaultColor: '#000000',
+		defaultOpacity: 0.9,
+	},
+	'modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png': {
+		defaultColor: '#ffffff',
+		defaultOpacity: 1.0,
+	},
 };
 
 // migration function - will evolve constantly
@@ -42,6 +64,12 @@ export async function tmfxDataMigration() {
 		if (dataVersionNow < DataVersion.V044) {
 			await updatePresetsV044();
 		}
+		if (dataVersionNow < DataVersion.V050) {
+			await updatePresetsV050();
+		}
+		if (dataVersionNow < DataVersion.V051) {
+			await updateTemplateSettingsV051();
+		}
 	}
 }
 
@@ -58,7 +86,7 @@ async function updatePresetsV030() {
 			if (!preset.hasOwnProperty('library')) {
 				preset.library = PresetsLibrary.MAIN;
 				log(`Migration 0.3.0 - Adding ${preset.name} to ${PresetsLibrary.MAIN}`);
-			} else if (preset.library === PresetsLibrary.TEMPLATE && !foundTemplateLibrary) {
+			} else if (preset.library === PresetsLibrary.REGION && !foundTemplateLibrary) {
 				foundTemplateLibrary = true;
 				log(`Migration 0.3.0 - Found template presets. Templates will not be added.`);
 			}
@@ -88,7 +116,7 @@ async function updatePresetsV040() {
 		// Adding zOrder for the template presets only
 		// Does not break visuals
 		for (const preset of presets) {
-			if (preset.library === PresetsLibrary.TEMPLATE) {
+			if (preset.library === 'tmfx-template') {
 				log(`Migration 0.4.0 - Checking template preset ${preset.name}...`);
 				let zOrder = 1;
 				for (const filter of preset.params) {
@@ -197,5 +225,81 @@ async function updatePresetsV044() {
 			error(`Migration 0.4.4 - Migration failed.`);
 			error(e);
 		}
+	}
+}
+
+async function updatePresetsV050() {
+	var presets = game.settings.get('tokenmagic', 'presets');
+
+	if (!(presets == null)) {
+		log(`Migration 0.5.0 - Launching presets data migration...`);
+
+		try {
+			console.log(presets);
+
+			for (const preset of presets) {
+				if (preset.library === 'tmfx-template') {
+					preset.library = PresetsLibrary.REGION;
+					if (!preset.defaultTexture) continue;
+					if (TEXTURE_MAPPINGS[preset.defaultTexture]) {
+						Object.assign(preset, TEXTURE_MAPPINGS[preset.defaultTexture]);
+					}
+					delete preset.defaultTexture;
+				}
+			}
+
+			await game.settings.set('tokenmagic', 'presets', presets);
+			await game.settings.set('tokenmagic', 'migration', DataVersion.V050);
+
+			log(`Migration 0.5.0 - Migration successful!`);
+		} catch (e) {
+			error(`Migration 0.5.0 - Migration failed.`);
+			error(e);
+		}
+	}
+}
+
+async function updateTemplateSettingsV051() {
+	const autoTemplateSettings = game.settings.get('tokenmagic', 'autoTemplateSettings');
+	if (foundry.utils.isEmpty(autoTemplateSettings)) return;
+
+	const TEMPLATE_TO_REGION_TYPE = {
+		circle: foundry.data.CircleShapeData.TYPE,
+		cone: foundry.data.ConeShapeData.TYPE,
+		ray: foundry.data.LineShapeData.TYPE,
+		rect: foundry.data.RectangleShapeData.TYPE,
+	};
+
+	try {
+		if (autoTemplateSettings.categories) {
+			for (const [type, config] of Object.entries(autoTemplateSettings.categories)) {
+				if (!config) continue;
+
+				for (const [templateType, templateConfig] of Object.entries(config)) {
+					if (TEMPLATE_TO_REGION_TYPE[templateType]) {
+						delete config[templateType];
+						config[TEMPLATE_TO_REGION_TYPE[templateType]] = templateConfig;
+
+						const { defaultColor } = TEXTURE_MAPPINGS[templateConfig.texture] ?? {};
+						if (defaultColor) templateConfig.color = defaultColor;
+					}
+				}
+			}
+		}
+
+		if (autoTemplateSettings.overrides) {
+			for (const override of Object.values(autoTemplateSettings.overrides)) {
+				const { defaultColor } = TEXTURE_MAPPINGS[override.texture] ?? {};
+				if (defaultColor) override.color = defaultColor;
+			}
+		}
+
+		await game.settings.set('tokenmagic', 'autoTemplateSettings', autoTemplateSettings);
+		await game.settings.set('tokenmagic', 'migration', DataVersion.V051);
+
+		log(`Migration 0.5.1 - Migration successful!`);
+	} catch (e) {
+		error(`Migration 0.5.1 - Auto-Template Migration failed.`);
+		error(e);
 	}
 }

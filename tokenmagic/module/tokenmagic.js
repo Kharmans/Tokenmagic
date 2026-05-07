@@ -158,10 +158,6 @@ export function isFilterCachingDisabled() {
 	return game.settings.get('tokenmagic', 'disableCaching');
 }
 
-export function isVideoDisabled() {
-	return game.settings.get('tokenmagic', 'disableVideo');
-}
-
 export function isTheOne() {
 	const theOne = game.users.find((user) => user.isGM && user.active);
 	return theOne && game.user === theOne;
@@ -234,7 +230,7 @@ export function fixPath(path) {
 }
 
 export function getControlledPlaceables() {
-	const authorizedLayers = [canvas.tokens, canvas.tiles, canvas.drawings, canvas.regions, canvas.templates];
+	const authorizedLayers = [canvas.tokens, canvas.tiles, canvas.drawings, canvas.regions];
 	if (authorizedLayers.some((layer) => layer === canvas.activeLayer)) {
 		return canvas.activeLayer.placeables.filter((p) => p.controlled === true) || [];
 	} else return [];
@@ -261,9 +257,6 @@ export function getPlaceableById(id, type) {
 			break;
 		case PlaceableType.TILE:
 			placeable = findPlaceable(canvas.tiles.placeables, id);
-			break;
-		case PlaceableType.TEMPLATE:
-			placeable = findPlaceable(canvas.templates.placeables, id);
 			break;
 		case PlaceableType.DRAWING:
 			placeable = findPlaceable(canvas.drawings.placeables, id);
@@ -560,7 +553,6 @@ export function TokenMagic() {
 			// we must browse the collection of placeables whatever their types
 			// we have just a filterId.
 			let placeable = getPlaceableById(placeableId, PlaceableType.TOKEN);
-			if (placeable == null) placeable = getPlaceableById(placeableId, PlaceableType.TEMPLATE);
 			if (placeable == null) placeable = getPlaceableById(placeableId, PlaceableType.TILE);
 			if (placeable == null) placeable = getPlaceableById(placeableId, PlaceableType.DRAWING);
 			if (placeable == null) placeable = getPlaceableById(placeableId, PlaceableType.REGION);
@@ -853,23 +845,19 @@ export function TokenMagic() {
 
 	function _singleLoadFilters(placeable, bulkLoading = false) {
 		let placeableType = placeable._TMFXgetPlaceableType();
-		if (placeableType === PlaceableType.TEMPLATE) {
-			let updateData = placeable.document.getFlag('tokenmagic', 'templateData');
+		if (placeableType === PlaceableType.REGION) {
+			let updateData = placeable.document.getFlag('tokenmagic', 'regionData');
 			if (!(updateData == null)) {
-				placeable.document.tmfxTextureAlpha = placeable._TMFXgetSprite().alpha = updateData.opacity;
-				placeable.document.tmfxTint = updateData.tint;
+				const sprite = placeable._TMFXgetSprite();
+				sprite.alpha = updateData.alpha ?? 1;
 			}
-		} else if (placeableType === PlaceableType.REGION) {
 			const sprite = placeable._TMFXgetSprite();
 			if (sprite) sprite.alpha = placeable.document.getFlag('tokenmagic', 'regionData')?.alpha ?? 0.5;
 		}
 
 		let filters = placeable.document.getFlag('tokenmagic', 'filters');
 		if (!(filters == null)) {
-			if (placeableType === PlaceableType.TEMPLATE) {
-				// get the first filterId to assign tmfxPreset
-				placeable.document.tmfxPreset = filters[0].tmFilters.tmFilterId;
-			} else if (placeableType === PlaceableType.REGION) {
+			if (placeableType === PlaceableType.REGION) {
 				const sprite = placeable._TMFXgetSprite();
 				if (sprite) sprite.setShaderClass(foundry.canvas.rendering.shaders.RegionShader);
 			}
@@ -1251,11 +1239,11 @@ export function TokenMagic() {
 		return pst.filter((preset) => preset.library === libraryName);
 	}
 
-	function _getPresetTemplateDefaultTexture(presetName, presetLibrary = PresetsLibrary.TEMPLATE) {
+	function _getPresetTemplateDefaults(presetName, presetLibrary = PresetsLibrary.REGION) {
 		let pst = game.settings.get('tokenmagic', 'presets');
 		const preset = pst.find((el) => el['name'] === presetName && el['library'] === presetLibrary);
-		if (!(preset == null) && preset.hasOwnProperty('defaultTexture')) return fixPath(preset.defaultTexture);
-		else return null;
+		const { defaultOpacity, defaultColor } = preset ?? {};
+		return { defaultOpacity, defaultColor };
 	}
 
 	function getPreset(presetName) {
@@ -1364,7 +1352,8 @@ export function TokenMagic() {
 
 		let pName = null,
 			pLibrary = null,
-			pDefaultTexture = null;
+			pDefaultColor = null,
+			pDefaultOpacity = null;
 		if (presetName instanceof Object) {
 			if (presetName.hasOwnProperty('name')) {
 				pName = presetName.name;
@@ -1372,8 +1361,11 @@ export function TokenMagic() {
 			if (presetName.hasOwnProperty('library')) {
 				pLibrary = presetName.library;
 			}
-			if (presetName.hasOwnProperty('defaultTexture')) {
-				pDefaultTexture = fixPath(presetName.defaultTexture);
+			if (presetName.hasOwnProperty('defaultColor')) {
+				pDefaultColor = presetName.defaultColor;
+			}
+			if (presetName.hasOwnProperty('defaultOpacity')) {
+				pDefaultOpacity = presetName.defaultOpacity;
 			}
 		} else {
 			pName = presetName;
@@ -1383,8 +1375,12 @@ export function TokenMagic() {
 			pLibrary = PresetsLibrary.MAIN;
 		}
 
-		if (typeof pDefaultTexture !== 'string') {
-			pDefaultTexture = null;
+		if (typeof pDefaultColor !== 'string') {
+			pDefaultColor = null;
+		}
+
+		if (typeof pDefaultOpacity !== 'number') {
+			pDefaultOpacity = null;
 		}
 
 		if (typeof pName !== 'string' && !(params instanceof Array)) {
@@ -1401,8 +1397,11 @@ export function TokenMagic() {
 		presetObject.name = pName;
 		presetObject.library = pLibrary;
 		presetObject.params = params;
-		if (pDefaultTexture != null) {
-			presetObject.defaultTexture = pDefaultTexture;
+		if (pDefaultColor != null) {
+			presetObject.defaultColor = pDefaultColor;
+		}
+		if (pDefaultOpacity != null) {
+			presetObject.defaultOpacity = pDefaultOpacity;
 		}
 
 		let state = true;
@@ -1488,7 +1487,7 @@ export function TokenMagic() {
 		_singleLoadFilters: _singleLoadFilters,
 		_cachedContainer: _cachedContainer,
 		_checkFilterId: _checkFilterId,
-		_getPresetTemplateDefaultTexture: _getPresetTemplateDefaultTexture,
+		_getPresetTemplateDefaults: _getPresetTemplateDefaults,
 	};
 }
 
@@ -1614,80 +1613,6 @@ function getAnchor(direction, angle, shapeType) {
 	return { x: x, y: y };
 }
 
-function onMeasuredTemplateConfig(templateConfig, html) {
-	if (!isVideoDisabled()) {
-		html.querySelector('[name="texture"]').setAttribute('type', 'imagevideo');
-	}
-
-	function compare(a, b) {
-		if (a.name < b.name) return -1;
-		if (a.name > b.name) return 1;
-		return 0;
-	}
-
-	let tmTemplate = templateConfig.document.object;
-
-	let opacity = tmTemplate.template.alpha;
-	let tint = '';
-	let currentPreset = emptyPreset;
-
-	// getting custom data
-	let tmfxTemplateData = tmTemplate.document.getFlag('tokenmagic', 'templateData');
-	if (!(tmfxTemplateData == null) && tmfxTemplateData instanceof Object) {
-		opacity = tmTemplate.document.tmfxTextureAlpha = tmfxTemplateData.opacity;
-		tint = tmTemplate.document.tmfxTint = tmfxTemplateData.tint ? PIXI.utils.hex2string(tmfxTemplateData.tint) : '';
-
-		if (tmfxTemplateData.preset !== undefined) currentPreset = tmfxTemplateData.preset;
-	}
-	let filters = tmTemplate.document.getFlag('tokenmagic', 'filters');
-	let presets = Magic.getPresets(PresetsLibrary.TEMPLATE);
-
-	if (filters && filters instanceof Array && filters.length >= 1) currentPreset = filters[0].tmFilters.tmFilterId;
-
-	// forming our injected html
-	let tmfxValues = '';
-	let selected = '';
-	tmfxValues += `<option value="${emptyPreset}"></option>`;
-	presets.sort(compare).forEach((preset) => {
-		selected = preset.name === currentPreset ? ' selected' : '';
-		tmfxValues += `<option value="${preset.name}"${selected}>${preset.name}</option>`;
-	});
-
-	let divPreset = `
-    <div class="form-group">
-        <label>${i18n('TMFX.template.opacity')}</label>
-        <div class="form-fields">
-			<range-picker name="flags.tokenmagic.templateData.opacity" value="${opacity}" min="0.0" max="1.0" step="0.01">
-				<input type="range" min="0.0" max="1" step="0.01">
-				<input type="number" min="0.0" max="1" step="0.01">
-			</range-picker>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label>${i18n('TMFX.template.fx')}</label>
-        <select class="tmfx" name="flags.tokenmagic.templateData.preset" data-dtype="String">
-        ${tmfxValues}
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>${i18n('TMFX.template.tint')}</label>
-        <div class="form-fields">
-			<color-picker name="flags.tokenmagic.templateData.tint" value="${tint}" placeholder="">
-				<input type="text" placeholder="">
-				<input type="color">
-			</color-picker>
-        </div>
-    </div>
-    `;
-
-	// injecting
-	const formGroup = html.querySelector('[name="texture"]').closest('.form-group');
-	$(formGroup).after(divPreset);
-	templateConfig.setPosition({ height: 'auto' });
-}
-
 async function onRegionConfig(regionConfig, html) {
 	if (html.querySelector('[name="flags.tokenmagic.regionData.alpha"]')) return;
 
@@ -1714,10 +1639,6 @@ Hooks.on('ready', () => {
 	initSocketListener();
 	window.TokenMagic = Magic;
 
-	if (!game.modules.get('lib-wrapper')?.active && game.user.isGM)
-		ui.notifications.warn("The 'Token Magic FX' module recommends to install and activate the 'libWrapper' module.");
-
-	Hooks.on('renderMeasuredTemplateConfig', onMeasuredTemplateConfig);
 	Hooks.on('renderRegionConfig', onRegionConfig);
 });
 
@@ -1758,8 +1679,6 @@ Hooks.on('canvasReady', (canvas) => {
 	Magic._loadFilters(tiles);
 	const drawings = canvas.drawings.placeables;
 	Magic._loadFilters(drawings);
-	const templates = canvas.templates.placeables;
-	Magic._loadFilters(templates);
 	const regions = canvas.regions.placeables;
 	Magic._loadFilters(regions);
 
@@ -1919,7 +1838,11 @@ Hooks.on('updateRegion', (document, options) => {
 	if (document.parent.id !== game.user.viewedScene) return;
 	let placeable = getPlaceableById(document._id, PlaceableType.REGION);
 
-	if (!options.flags?.tokenmagic || options.x || options.y) {
+	if (
+		options.flags?.tokenmagic instanceof foundry.data.operators.ForcedDeletion ||
+		options.flags?.tokenmagic?.filters instanceof foundry.data.operators.ForcedDeletion ||
+		options.shapes
+	) {
 		Anime.removeAnimation(document._id); // removing animations on this placeable
 		Magic._clearImgFiltersByPlaceable(placeable); // clearing the filters (owned by tokenmagic)
 		requestLoadFilters(placeable, 250);
@@ -1939,135 +1862,15 @@ Hooks.on('updateRegion', (document, options) => {
 });
 
 /* -------------------------------------------- */
-/*  Measured Templates Management               */
-/* -------------------------------------------- */
 
-Hooks.on('createMeasuredTemplate', (document) => {
-	const scene = document.parent;
-	if (!(scene == null) && scene.id === game.user.viewedScene && document.flags?.tokenmagic?.filters) {
-		let placeable = getPlaceableById(document._id, PlaceableType.TEMPLATE);
-		requestLoadFilters(placeable, 250); // request to load filters (when pixi containers are ready)
-	}
-});
-
-/* -------------------------------------------- */
-
-Hooks.on('deleteMeasuredTemplate', (_, document) => {
-	if (!(document == null || !document._id)) {
-		Anime.removeAnimation(document._id);
-	}
-});
-
-/* -------------------------------------------- */
-
-Hooks.on('updateMeasuredTemplate', (document, options) => {
-	if (document.parent.id !== game.user.viewedScene) return;
-	let placeable = getPlaceableById(document._id, PlaceableType.TEMPLATE);
-	if (!placeable) return;
-
-	if (options.texture) {
-		Anime.removeAnimation(document._id); // removing animations on this placeable
-		Magic._clearImgFiltersByPlaceable(placeable); // clearing the filters (owned by tokenmagic)
-		requestLoadFilters(placeable, 250); // querying filters reload (when pixi containers are ready)
-	} else {
-		if (!placeable.loadingRequest) {
-			Magic._updateFilters(document, options, PlaceableType.TEMPLATE);
-			Magic._updateTemplateData(document, options, PlaceableType.TEMPLATE);
-		}
-		if ('-=texture' in options) {
-			document.object?.draw();
-		}
-	}
-});
-
-/* -------------------------------------------- */
-
-Hooks.on('preUpdateMeasuredTemplate', async (document, options) => {
-	function getTint() {
-		if (options.flags?.tokenmagic?.templateData?.tint !== undefined) {
-			return options.flags.tokenmagic.templateData.tint;
-		} else if (document.flags?.tokenmagic?.tint !== undefined) {
-			return document.flags.tokenmagic.tint;
-		} else return '';
-	}
-
-	function getFX() {
-		if (options.flags?.tokenmagic?.templateData?.preset !== undefined) {
-			return options.flags.tokenmagic.templateData.preset;
-		} else if (document.flags?.tokenmagic?.templateData?.preset !== undefined) {
-			return document.flags.tokenmagic.templateData.preset;
-		} else if (document.tmfxPreset !== undefined) {
-			return document.tmfxPreset;
-		} else return emptyPreset;
-	}
-
-	function getDirection() {
-		if (options.direction) {
-			return options.direction;
-		} else if (document.direction) {
-			return document.direction;
-		} else return 0;
-	}
-
-	function getAngle() {
-		if (options.angle) {
-			return options.angle;
-		} else if (document.angle) {
-			return document.angle;
-		} else return 0;
-	}
-
-	function getShapeType() {
-		if (options.t) {
-			return options.t;
-		} else if (document.t) {
-			return document.t;
-		} else return 'ITSBAD';
-	}
-
-	let measuredTemplateInstance = canvas.templates.get(document._id);
-	let templateTint = getTint();
-	let presetUpdate = options.flags?.tokenmagic?.templateData?.preset !== undefined;
-	let tintUpdate = options.flags?.tokenmagic?.templateData?.tint !== undefined;
-	let directionUpdate = options.hasOwnProperty('direction');
-	let angleUpdate = options.hasOwnProperty('angle');
-	let typeUpdate = options.hasOwnProperty('t');
-
-	if (tintUpdate)
-		options.flags.tokenmagic.templateData.tint = templateTint !== '' ? Color.from(templateTint).valueOf() : null;
-
-	if (presetUpdate || tintUpdate || directionUpdate || typeUpdate || angleUpdate) {
-		let templateFX = getFX();
-		if (templateFX !== emptyPreset) {
-			let anchor = getAnchor(getDirection(), getAngle(), getShapeType());
-			let presetOptions = {
-				name: templateFX,
-				library: PresetsLibrary.TEMPLATE,
-				anchorX: anchor.x,
-				anchorY: anchor.y,
-			};
-			if (templateTint && templateTint !== '') {
-				presetOptions.color = Color.from(templateTint).valueOf();
-			}
-			let preset = Magic.getPreset(presetOptions);
-			if (!(preset == null)) {
-				if (presetUpdate) await measuredTemplateInstance.TMFXaddFilters(preset, true);
-				else await measuredTemplateInstance.TMFXaddUpdateFilters(preset);
-			}
-		} else await measuredTemplateInstance.TMFXdeleteFilters();
-	}
-});
-
-/* -------------------------------------------- */
-
-Hooks.on('preCreateMeasuredTemplate', (document) => {
+Hooks.on('preCreateRegion', (document) => {
 	// Do nothing if we're on a 3D Canvas scene
 	if (game.Levels3DPreview?._active) return;
 
 	// Apply auto-preset if needed
 	const templates = TokenMagicSettings.getSystemTemplates();
 	if (templates?.enabled) {
-		templates.preCreateMeasuredTemplate?.(document);
+		templates.preCreateRegion?.(document);
 	}
 
 	const hasFlags = document.flags;
@@ -2075,6 +1878,9 @@ Hooks.on('preCreateMeasuredTemplate', (document) => {
 	let hasTint = false;
 	let hasOpacity = false;
 	let hasFlagsNoOptions = false;
+	let hasRegionColor = false;
+	let regionOpacity;
+	let tmfxTint;
 
 	if (hasFlags && document.flags.tokenmagic?.options) {
 		const opt = document.flags.tokenmagic.options;
@@ -2083,16 +1889,17 @@ Hooks.on('preCreateMeasuredTemplate', (document) => {
 			hasPreset = true;
 		}
 		if (opt.tmfxTint) {
-			document.tmfxTint = opt.tmfxTint;
+			tmfxTint = opt.tmfxTint;
 			hasTint = true;
 		}
-		if (opt.tmfxTextureAlpha) {
-			document.tmfxTextureAlpha = opt.tmfxTextureAlpha;
+		if (opt.tmfxRegionOpacity) {
+			regionOpacity = opt.tmfxRegionOpacity;
 			hasOpacity = true;
 		}
-		if (opt.tmfxTexture) {
-			document.texture = opt.tmfxTexture;
-			document.updateSource({ texture: opt.tmfxTexture });
+		if (opt.tmfxRegionColor) {
+			document.color = Color.fromString(opt.tmfxRegionColor);
+			document.updateSource({ color: opt.tmfxRegionColor });
+			hasRegionColor = true;
 		}
 	} else hasFlagsNoOptions = true;
 
@@ -2109,35 +1916,31 @@ Hooks.on('preCreateMeasuredTemplate', (document) => {
 	}
 
 	// normalizing color to value if needed
-	if (hasTint && typeof document.tmfxTint !== 'number') {
-		document.tmfxTint = Color.from(document.tmfxTint).valueOf();
+	if (hasTint && typeof tmfxTint !== 'number') {
+		tmfxTint = Color.from(tmfxTint).valueOf();
 	}
 
 	let tmfxFiltersData = null;
 
 	// FX to add ?
 	if (hasPreset) {
-		// Compute shader anchor point
-		let anchor = getAnchor(document.direction, document.angle, document.t);
-
 		// Constructing the preset search object
 		let pstSearch = {
 			name: document.tmfxPreset,
-			library: PresetsLibrary.TEMPLATE,
-			anchorX: anchor.x,
-			anchorY: anchor.y,
+			library: PresetsLibrary.REGION,
 		};
 
 		// Adding tint if needed
-		if (hasTint) pstSearch.color = document.tmfxTint;
+		if (hasTint) pstSearch.color = tmfxTint;
 
 		// Retrieving the preset
 		let preset = Magic.getPreset(pstSearch);
 
 		if (!(preset == null) && preset instanceof Array) {
-			let defaultTex = Magic._getPresetTemplateDefaultTexture(pstSearch.name);
-			if (!(defaultTex == null) && !hasTexture) {
-				document.updateSource({ texture: defaultTex });
+			let { defaultOpacity, defaultColor } = Magic._getPresetTemplateDefaults(pstSearch.name);
+
+			if (!(defaultColor == null) && !hasRegionColor) {
+				document.updateSource({ color: defaultColor });
 			}
 
 			let persist = true;
@@ -2163,7 +1966,7 @@ Hooks.on('preCreateMeasuredTemplate', (document) => {
 				params.placeableId = null;
 				params.filterInternalId = foundry.utils.randomID();
 				params.filterOwner = game.data.userId;
-				params.placeableType = PlaceableType.TEMPLATE;
+				params.placeableType = PlaceableType.REGION;
 
 				newFilters.push({
 					tmFilters: {
@@ -2182,13 +1985,11 @@ Hooks.on('preCreateMeasuredTemplate', (document) => {
 		document.tmfxPreset = emptyPreset;
 	}
 
-	if (!hasOpacity) document.tmfxTextureAlpha = 1;
-	if (!hasTint) document.tmfxTint = null;
+	if (!hasOpacity) regionOpacity = 1;
 
 	let tmfxFlags = {
-		templateData: {
-			opacity: document.tmfxTextureAlpha,
-			tint: document.tmfxTint,
+		regionData: {
+			opacity: regionOpacity,
 		},
 		filters: tmfxFiltersData,
 		options: null,

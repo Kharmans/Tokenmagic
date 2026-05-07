@@ -2,7 +2,8 @@
 	{
 		"name": "Splash 1",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "splash",
@@ -35,7 +36,8 @@
 	{
 		"name": "Splash 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "splash",
@@ -75,7 +77,8 @@
 	{
 		"name": "Splash 3",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fumes",

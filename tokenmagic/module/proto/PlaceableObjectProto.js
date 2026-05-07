@@ -69,12 +69,10 @@ PlaceableObject.prototype._TMFXgetSprite = function () {
 			return this.mesh;
 		case PlaceableType.TILE:
 			return this.mesh ?? this.bg;
-		case PlaceableType.TEMPLATE:
-			return this.template;
 		case PlaceableType.DRAWING:
 			return this.hasText ? this.text : this.shape;
 		case PlaceableType.REGION:
-			return this.children.find((ch) => ch instanceof foundry.canvas.placeables.regions.RegionMesh);
+			return this.layer._highlights.children.find((ch) => ch.region === this);
 		default:
 			return null;
 	}
@@ -103,12 +101,10 @@ PlaceableObject.prototype._TMFXcheckSprite = function () {
 		case PlaceableType.TOKEN:
 		case PlaceableType.TILE:
 			return !(this.mesh == null);
-		case PlaceableType.TEMPLATE:
-			return !(this.template == null);
 		case PlaceableType.DRAWING:
 			return !(this.shape == null);
 		case PlaceableType.REGION:
-			return !(this.children.find((ch) => ch instanceof foundry.canvas.placeables.regions.RegionMesh) == null);
+			return !(this.layer._highlights.children.find((ch) => ch.region === this) == null);
 		default:
 			return null;
 	}
@@ -178,13 +174,9 @@ PlaceableObject.prototype._TMFXunsetRawFilters = function () {
 
 PlaceableObject.prototype._TMFXgetPlaceableType = function () {
 	if (
-		[
-			PlaceableType.TOKEN,
-			PlaceableType.TEMPLATE,
-			PlaceableType.TILE,
-			PlaceableType.DRAWING,
-			PlaceableType.REGION,
-		].includes(this.constructor.embeddedName)
+		[PlaceableType.TOKEN, PlaceableType.TILE, PlaceableType.DRAWING, PlaceableType.REGION].includes(
+			this.constructor.embeddedName,
+		)
 	)
 		return this.constructor.embeddedName;
 	return PlaceableType.NOT_SUPPORTED;

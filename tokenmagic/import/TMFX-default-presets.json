@@ -1699,7 +1699,8 @@
 	{
 		"name": "Watery Surface",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "flood",
@@ -1724,7 +1725,8 @@
 	{
 		"name": "Protoplasm",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "liquid",
@@ -1748,7 +1750,8 @@
 	{
 		"name": "Watery Surface 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "liquid",
@@ -1772,7 +1775,8 @@
 	{
 		"name": "Smoky Area",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "smoke",
@@ -1795,7 +1799,8 @@
 	{
 		"name": "Shock",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "electric",
@@ -1817,7 +1822,8 @@
 	{
 		"name": "Annihilating Rays",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "xray",
@@ -1844,7 +1850,8 @@
 	{
 		"name": "Classic Rays",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ray",
@@ -1868,7 +1875,8 @@
 	{
 		"name": "Smoke Filaments",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fumes",
@@ -1889,7 +1897,8 @@
 	{
 		"name": "Flames",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fire",
@@ -1913,7 +1922,8 @@
 	{
 		"name": "Thick Fog",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "xfog",
@@ -1958,7 +1968,8 @@
 	{
 		"name": "Waves",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "wave",
@@ -1985,7 +1996,8 @@
 	{
 		"name": "Waves 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "wave",
@@ -2012,7 +2024,8 @@
 	{
 		"name": "Waves 3",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "wave",
@@ -2039,7 +2052,8 @@
 	{
 		"name": "Zone : Fire",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "xglow",
@@ -2089,7 +2103,8 @@
 	{
 		"name": "Zone : Electricity",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/white-tone-strong-opacity.png",
+		"defaultOpacity": 0.9,
+		"defaultColor": "#ffffff",
 		"params": [
 			{
 				"filterType": "xglow",
@@ -2137,7 +2152,8 @@
 	{
 		"name": "Zone : Blizzard",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "xglow",
@@ -2289,7 +2305,8 @@
 	{
 		"name": "Wild Magic",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "liquid",
@@ -2333,7 +2350,8 @@
 	{
 		"name": "Spider Web 1",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "web",
@@ -2377,7 +2395,8 @@
 	{
 		"name": "Spider Web 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-strong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "web",

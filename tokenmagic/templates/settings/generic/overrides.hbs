@@ -48,14 +48,12 @@
 		</div>
 		<div class='form-group'>
 			<label for="autoTemplateSettings.overrides.{{idx}}.texture">
-				{{localize 'TMFX.settings.autoTemplateSettings.texture.label'}}
+				{{localize 'TMFX.settings.autoTemplateSettings.color.label'}}
 			</label>
 			<div class='form-fields'>
-				<file-picker 
-					name="autoTemplateSettings.overrides.{{idx}}.texture"
-					type="imagevideo" 
-					placeholder="path/image.png"
-					value="{{lookup (lookup @root.settings.autoTemplateSettings.overrides idx) 'texture'}}"></file-picker>
+				<color-picker 
+					name="autoTemplateSettings.overrides.{{idx}}.color"
+					value="{{lookup (lookup @root.settings.autoTemplateSettings.overrides idx) 'color'}}"></color-picker>
 			</div>
 		</div>
 	</fieldset>

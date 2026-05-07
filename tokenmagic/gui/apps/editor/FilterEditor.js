@@ -41,13 +41,14 @@ export async function handleTMFXDropEvent(documents, data) {
 		if (!preset?.params?.length) return;
 		preset = deepClone(preset);
 
-		if (preset.defaultTexture && document.documentName === 'MeasuredTemplate') {
-			for (const document of documents) {
-				await document.update({ texture: preset.defaultTexture }); // TODO, update as single operation
-			}
-		}
-
 		for (const document of documents) {
+			if (document.documentName === 'Region' && (preset.defaultColor != null || preset.defaultOpacity != null)) {
+				const update = {};
+				if (preset.defaultColor != null) update.color = preset.defaultColor;
+				if (preset.defaultOpacity != null) update['flags.tokenmagic.regionData.alpha'] = preset.defaultOpacity;
+				await document.update(update);
+			}
+
 			await TokenMagic.addFilters(document, preset.params);
 		}
 	} else if (data.type === 'TMFX Filter') {
@@ -89,9 +90,12 @@ async function handleFoundryGalleryDropEvent(documents, data) {
 		const entry = await response.json();
 		const preset = entry.data;
 
-		if (preset.defaultTexture && document.documentName === 'MeasuredTemplate') {
+		if (document.documentName === 'Region' && (preset.defaultColor != null || preset.defaultOpacity != null)) {
 			for (const document of documents) {
-				await document.update({ texture: preset.defaultTexture }); // TODO, update as single operation
+				const update = {};
+				if (preset.defaultColor != null) update.color = preset.defaultColor;
+				if (preset.defaultOpacity != null) update['flags.tokenmagic.regionData.alpha'] = preset.defaultOpacity;
+				await document.update(update); // TODO, update as single operation
 			}
 		}
 		for (const document of documents) {
@@ -270,13 +274,13 @@ class FilterSelector extends HandlebarsApplicationMixin(ApplicationV2) {
 				action: 'preset',
 				tooltip: game.i18n.localize('TMFX.app.filterSelector.controls.save'),
 				icon: 'fa-solid fa-floppy-disk',
-				disabled: !hasFilters,
+				disabled: !hasFilters || this._documents.length !== 1,
 			},
 			{
 				action: 'macro',
 				tooltip: game.i18n.localize('TMFX.app.filterSelector.controls.macro'),
 				icon: 'fa-solid fa-code',
-				disabled: !hasFilters,
+				disabled: !hasFilters || this._documents.length !== 1,
 			},
 			{
 				action: 'randomize',
@@ -585,9 +589,12 @@ class FilterSelector extends HandlebarsApplicationMixin(ApplicationV2) {
 			const sp = new SavePreset(document, { name: filterId });
 			const params = sp._prepareParams();
 
-			if (document.documentName === 'MeasuredTemplate') {
-				const preset = { name: filterId, params, library: PresetsLibrary.TEMPLATE };
-				if (document.texture) preset.defaultTexture = document.texture;
+			if (document.documentName === 'Region') {
+				const preset = { name: filterId, params, library: PresetsLibrary.REGION };
+				const defaultColor = document.color.toString();
+				const defaultOpacity = foundry.utils.getProperty(document, 'flags.tokenmagic.regionData.alpha');
+				preset.defaultColor = defaultColor;
+				if (defaultOpacity != null) preset.defaultOpacity = defaultOpacity;
 				submitPresetToGallery(preset);
 			} else submitPresetToGallery({ name: filterId, params, library: PresetsLibrary.MAIN });
 		} catch (e) {
@@ -1494,7 +1501,8 @@ class SavePreset extends HandlebarsApplicationMixin(ApplicationV2) {
 				context.name = this._name;
 				context.filterRandomized = this._filterRandomized;
 				context.filterAnimated = this._filterAnimated;
-				context.texture = this._texture;
+				context.defaultOpacity = this._opacity ?? 1.0;
+				context.defaultColor = this._color ?? '#000000';
 				context.documentName = this._document.documentName;
 				context.displayAutoDestroy = this._originalParams.some((param) => this._paramHasFiniteLoops(param));
 				if (this._displayMacro) context.macro = this._genMacro();
@@ -1518,14 +1526,15 @@ class SavePreset extends HandlebarsApplicationMixin(ApplicationV2) {
 	 * Process form data
 	 */
 	static async _onSubmit(event, form, formData) {
-		const { name, filterRandomized, filterAnimated, autoDestroy, texture } = foundry.utils.expandObject(
+		const { name, filterRandomized, filterAnimated, autoDestroy, color, opacity } = foundry.utils.expandObject(
 			formData.object,
 		);
 
 		this._name = name;
 		this._filterRandomized = filterRandomized;
 		this._filterAnimated = filterAnimated;
-		this._texture = texture;
+		this._color = color;
+		this._opacity = opacity;
 		this._autoDestroy = autoDestroy;
 
 		if (this._displayMacro) this.element.querySelector('textarea').value = this._genMacro();
@@ -1533,8 +1542,9 @@ class SavePreset extends HandlebarsApplicationMixin(ApplicationV2) {
 
 	static async _onSave(event) {
 		const name = this._name;
-		const library = this._document.documentName === 'MeasuredTemplate' ? PresetsLibrary.TEMPLATE : PresetsLibrary.MAIN;
-		const defaultTexture = this._texture;
+		const library = this._document.documentName === 'Region' ? PresetsLibrary.REGION : PresetsLibrary.MAIN;
+		const defaultColor = this._color;
+		const defaultOpacity = this._opacity;
 		const params = this._prepareParams();
 
 		const preset = TokenMagic.getPreset({ name, library });
@@ -1547,7 +1557,7 @@ class SavePreset extends HandlebarsApplicationMixin(ApplicationV2) {
 			await TokenMagic.deletePreset({ name, library }, true);
 		}
 
-		await TokenMagic.addPreset({ name, library, defaultTexture }, params);
+		await TokenMagic.addPreset({ name, library, defaultColor, defaultOpacity }, params);
 		this.close(true);
 	}
 }

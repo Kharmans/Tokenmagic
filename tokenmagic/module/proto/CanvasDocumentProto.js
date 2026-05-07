@@ -36,13 +36,7 @@ Object.values(PlaceableType).forEach((type) => {
 
 	cls.prototype._TMFXgetPlaceableType = function () {
 		if (
-			[
-				PlaceableType.TOKEN,
-				PlaceableType.TEMPLATE,
-				PlaceableType.TILE,
-				PlaceableType.DRAWING,
-				PlaceableType.REGION,
-			].includes(this.documentName)
+			[PlaceableType.TOKEN, PlaceableType.TILE, PlaceableType.DRAWING, PlaceableType.REGION].includes(this.documentName)
 		)
 			return this.documentName;
 		return PlaceableType.NOT_SUPPORTED;

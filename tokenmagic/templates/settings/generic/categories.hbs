@@ -30,29 +30,28 @@
 
 		{{!-- Template Types --}}
 		<details>
-			<summary>{{localize "DOCUMENT.MeasuredTemplates"}}</summary>
-			{{#each @root.templateTypes as |tplKey tplType|}}
+			<summary>{{localize "DOCUMENT.Region"}}</summary>
+			{{#each @root.templateTypes as |tplType|}}
 			<fieldset>
-				<legend>{{tplType}}</legend>
+				<legend>{{localize (concat (concat 'SHAPE.TYPES.' tplType) '.name')}}</legend>
 
 				{{!-- Special Effects --}}
 				<div class='form-group'>
-					<label for="autoTemplateSettings.categories.{{dmgKey}}.{{tplKey}}.preset">{{localize 'TMFX.template.fx'}}</label>
-					<select name="autoTemplateSettings.categories.{{dmgKey}}.{{tplKey}}.preset">
-						{{selectOptions @root.presets selected=(lookup (lookup (lookup @root.settings.autoTemplateSettings.categories dmgKey) tplKey) 'preset') valueAttr="name" labelAttr="name" localize=false}}
+					<label for="autoTemplateSettings.categories.{{dmgKey}}.{{tplType}}.preset">{{localize 'TMFX.template.fx'}}</label>
+					<select name="autoTemplateSettings.categories.{{dmgKey}}.{{tplType}}.preset">
+						{{selectOptions @root.presets selected=(lookup (lookup (lookup @root.settings.autoTemplateSettings.categories dmgKey) tplType) 'preset') valueAttr="name" labelAttr="name" localize=false}}
 					</select>
 				</div>
 
 				{{!-- Texture --}}
 				<div class='form-group'>
-						<label for="autoTemplateSettings.categories.{{dmgKey}}.{{tplKey}}.texture">
-							{{localize 'TMFX.settings.autoTemplateSettings.texture.label'}}
+						<label for="autoTemplateSettings.categories.{{dmgKey}}.{{tplType}}.texture">
+							{{localize 'TMFX.settings.autoTemplateSettings.color.label'}}
 						</label>
 					<div class='form-fields'>
-						<file-picker 
-							name="autoTemplateSettings.categories.{{dmgKey}}.{{tplKey}}.texture" 
-							type="imagevideo" 
-							value="{{lookup (lookup (lookup @root.settings.autoTemplateSettings.categories dmgKey) tplKey) 'texture'}}"></file-picker>
+						<color-picker 
+							name="autoTemplateSettings.categories.{{dmgKey}}.{{tplType}}.color" 
+							value="{{lookup (lookup (lookup @root.settings.autoTemplateSettings.categories dmgKey) tplType) 'color'}}"></color-picker>
 					</div>
 				</div>
 			</fieldset>

@@ -69,7 +69,8 @@ class PresetToggler extends PresetSearch {
 		const { filterId } = preset.params[0];
 		const isActive = controlled.some((c) => TokenMagic.hasFilterId(c, filterId));
 		const presetQuery = { name, library };
-		const texture = preset.defaultTexture;
+		const defaultColor = preset.defaultColor;
+		const defaultOpacity = preset.defaultOpacity;
 
 		if (isActive) {
 			const filterIds = new Set(TokenMagic.getPreset(presetQuery).map((p) => p.filterId));
@@ -78,11 +79,8 @@ class PresetToggler extends PresetSearch {
 				for (const filterId of filterIds) {
 					if (TokenMagic.hasFilterId(placeable, filterId)) {
 						await TokenMagic.deleteFilters(placeable, filterId);
-						if (
-							placeable.document.documentName === 'MeasuredTemplate' &&
-							!placeable.document.flags['tokenmagic']?.filters
-						) {
-							await placeable.document.update({ ['-=texture']: null });
+						if (placeable.document.documentName === 'Region' && !placeable.document.flags['tokenmagic']?.filters) {
+							await placeable.document.update({ ['flags.tokenmagic.regionData']: _del });
 						}
 					}
 				}
@@ -91,8 +89,11 @@ class PresetToggler extends PresetSearch {
 			const preset = TokenMagic.getPreset(presetQuery);
 			for (const placeable of controlled) {
 				if (!TokenMagic.hasFilterId(placeable, filterId)) {
-					if (texture && placeable.document.documentName === 'MeasuredTemplate') {
-						await placeable.document.update({ texture });
+					if (placeable.document.documentName === 'Region' && (defaultOpacity != null || defaultColor != null)) {
+						const update = {};
+						if (defaultOpacity != null) update['flags.tokenmagic.regionData.alpha'] = defaultOpacity;
+						if (defaultColor != null) update.color = defaultColor;
+						await placeable.document.update(update);
 					}
 					await TokenMagic.addUpdateFilters(placeable, preset);
 				}

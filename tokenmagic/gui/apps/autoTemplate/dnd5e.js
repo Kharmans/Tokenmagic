@@ -1,4 +1,4 @@
-import { defaultOpacity, emptyPreset } from '../../../module/constants.js';
+import { defaultOpacity, emptyPreset, TEMPLATE_TYPES } from '../../../module/constants.js';
 import { TemplateSettings } from './TemplateSettings.js';
 
 export class AutoTemplateDND5E extends TemplateSettings {
@@ -63,8 +63,8 @@ export class AutoTemplateDND5E extends TemplateSettings {
 				}
 				defaultConfig.categories[dmgType] = config;
 			}
-			Object.values(CONST.MEASURED_TEMPLATE_TYPES).forEach((tplType) => {
-				const config = { preset: emptyPreset, texture: null };
+			TEMPLATE_TYPES.forEach((tplType) => {
+				const config = { preset: emptyPreset, color: null };
 				switch (dmgType.toLowerCase()) {
 					case 'acid':
 						config.preset = 'Watery Surface 2';
@@ -139,7 +139,7 @@ export class AutoTemplateDND5E extends TemplateSettings {
 
 	_prepareCategoriesContext(context, options) {
 		context.dmgTypes = CONFIG.DND5E.damageTypes;
-		context.templateTypes = CONST.MEASURED_TEMPLATE_TYPES;
+		context.templateTypes = TEMPLATE_TYPES;
 	}
 }
 
@@ -148,13 +148,13 @@ function fromConfig(config, template) {
 	if (config.preset && config.preset !== '' && config.preset !== emptyPreset) {
 		o.tokenmagic.options.tmfxPreset = config.preset;
 	}
-	if (config.texture && config.texture !== '') {
-		o.tokenmagic.options.tmfxTexture = config.texture;
+	if (config.regionColor && config.regionColor !== '') {
+		o.tokenmagic.options.tmfxRegionColor = config.tint;
 	}
 	if (config.tint && config.tint !== '') {
 		o.tokenmagic.options.tmfxTint = config.tint;
 	}
-	o.tokenmagic.options.tmfxTextureAlpha = config.opacity;
+	o.tokenmagic.options.tmfxRegionOpacity = config.opacity;
 	template.updateSource({ flags: { tokenmagic: o.tokenmagic } });
 }
 
@@ -206,7 +206,7 @@ function fromCategories(categories = {}, activity, template) {
 	}
 	fromConfig(
 		foundry.utils.mergeObject(config, { opacity: dmgSettings.opacity, tint: dmgSettings.tint }, true, true),
-		template
+		template,
 	);
 	return true;
 }

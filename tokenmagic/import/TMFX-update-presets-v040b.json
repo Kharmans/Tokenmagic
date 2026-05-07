@@ -2,7 +2,8 @@
 	{
 		"name": "Flames 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fire",
@@ -28,7 +29,8 @@
 	{
 		"name": "Flames 3",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-pure.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "fire",
@@ -82,7 +84,8 @@
 	{
 		"name": "Classic Rays 2",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-vstrong-opacity.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ray",
@@ -108,7 +111,8 @@
 	{
 		"name": "Fire Rays",
 		"library": "tmfx-template",
-		"defaultTexture": "modules/tokenmagic/fx/assets/templates/black-tone-pure.png",
+		"defaultOpacity": 1.0,
+		"defaultColor": "#000000",
 		"params": [
 			{
 				"filterType": "ray",
