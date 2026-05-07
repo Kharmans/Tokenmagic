@@ -231,8 +231,8 @@ export function fixPath(path) {
 
 export function getControlledPlaceables() {
 	const authorizedLayers = [canvas.tokens, canvas.tiles, canvas.drawings, canvas.regions];
-	if (authorizedLayers.some((layer) => layer === canvas.activeLayer)) {
-		return canvas.activeLayer.placeables.filter((p) => p.controlled === true) || [];
+	if (authorizedLayers.includes(canvas.activeLayer)) {
+		return [...canvas.activeLayer.controlled];
 	} else return [];
 }
 
@@ -918,7 +918,7 @@ export function TokenMagic() {
 			!(
 				options.hasOwnProperty('flags') &&
 				options.flags.hasOwnProperty('tokenmagic') &&
-				(options.flags.tokenmagic.hasOwnProperty('filters') || options.flags.tokenmagic.hasOwnProperty('-=filters'))
+				options.flags.tokenmagic.hasOwnProperty('filters')
 			)
 		) {
 			return;
@@ -933,7 +933,7 @@ export function TokenMagic() {
 		}
 
 		// Shortcut when all filters are deleted
-		if (options.flags.tokenmagic.hasOwnProperty('-=filters')) {
+		if (options.flags.tokenmagic.filters instanceof foundry.data.operators.ForcedDeletion) {
 			Anime.removeAnimation(data._id); // removing animations on this placeable
 			this._clearImgFiltersByPlaceable(placeable); // clearing the filters (owned by tokenmagic)
 			return;
@@ -1532,9 +1532,9 @@ function initSocketListener() {
 			let scene = game.scenes.get(data.tmScene);
 			if (scene == null) return;
 
-			// preparing flag data (with -= if the data is null)
+			// preparing flag data (with _del if the data is null)
 			let updateData;
-			if (data.tmFlag == null) updateData = { [`flags.tokenmagic.-=${targetFlag}`]: null };
+			if (data.tmFlag == null) updateData = { [`flags.tokenmagic.${targetFlag}`]: _del };
 			else updateData = { [`flags.tokenmagic.${targetFlag}`]: data.tmFlag };
 			updateData['_id'] = data.tmPlaceableId;
 
