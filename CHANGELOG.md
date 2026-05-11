@@ -1,3 +1,11 @@
+# Token Magic FX - Update v0.8.0
+
+- v14 support
+
+**Filter Editor**
+
+- Multiple placeables can now be selected and edited through the same editor window
+
 # Token Magic FX - Update v0.7.6.3
 
 - Fixed Presets applied through the Filter Editor becoming mutated

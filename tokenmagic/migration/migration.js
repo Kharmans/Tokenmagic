@@ -235,16 +235,12 @@ async function updatePresetsV050() {
 		log(`Migration 0.5.0 - Launching presets data migration...`);
 
 		try {
-			console.log(presets);
-
 			for (const preset of presets) {
 				if (preset.library === 'tmfx-template') {
 					preset.library = PresetsLibrary.REGION;
-					if (!preset.defaultTexture) continue;
 					if (TEXTURE_MAPPINGS[preset.defaultTexture]) {
 						Object.assign(preset, TEXTURE_MAPPINGS[preset.defaultTexture]);
 					}
-					delete preset.defaultTexture;
 				}
 			}
 
