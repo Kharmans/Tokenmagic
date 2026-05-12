@@ -1,6 +1,6 @@
 import { TokenMagic, isTheOne, log, warn, error } from '../module/tokenmagic.js';
 import { PresetsLibrary, templatePresets } from '../fx/presets/defaultpresets.js';
-import { defaultOpacity } from '../module/constants.js';
+import { defaultOpacity, TEMPLATE_TO_REGION_TYPE } from '../module/constants.js';
 
 const Magic = TokenMagic();
 
@@ -258,13 +258,6 @@ async function updatePresetsV050() {
 async function updateTemplateSettingsV051() {
 	const autoTemplateSettings = game.settings.get('tokenmagic', 'autoTemplateSettings');
 	if (foundry.utils.isEmpty(autoTemplateSettings)) return;
-
-	const TEMPLATE_TO_REGION_TYPE = {
-		circle: foundry.data.CircleShapeData.TYPE,
-		cone: foundry.data.ConeShapeData.TYPE,
-		ray: foundry.data.LineShapeData.TYPE,
-		rect: foundry.data.RectangleShapeData.TYPE,
-	};
 
 	try {
 		if (autoTemplateSettings.categories) {

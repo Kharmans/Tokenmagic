@@ -1,4 +1,4 @@
-import { defaultOpacity, emptyPreset, TEMPLATE_TYPES } from '../../../module/constants.js';
+import { defaultOpacity, emptyPreset, TEMPLATE_REGION_TYPES } from '../../../module/constants.js';
 import { TemplateSettings } from './TemplateSettings.js';
 
 export class AutoTemplateTheWitcherTRPG extends TemplateSettings {
@@ -56,7 +56,7 @@ export class AutoTemplateTheWitcherTRPG extends TemplateSettings {
 				}
 				defaultConfig.categories[meleeSkillType] = config;
 			}
-			TEMPLATE_TYPES.forEach((tplType) => {
+			TEMPLATE_REGION_TYPES.forEach((tplType) => {
 				const config = { preset: emptyPreset, texture: null };
 				switch (meleeSkillType.toLowerCase()) {
 					case 'acid':
@@ -107,23 +107,23 @@ export class AutoTemplateTheWitcherTRPG extends TemplateSettings {
 			dmgTypes[type] = { label: type.charAt(0).toUpperCase() + type.slice(1) };
 		}
 		context.dmgTypes = dmgTypes;
-		context.templateTypes = TEMPLATE_TYPES;
+		context.templateTypes = TEMPLATE_REGION_TYPES;
 	}
 
-	preCreateRegion(template) {
-		let hasPreset = template.hasOwnProperty('tmfxPreset');
+	preCreateRegion(region) {
+		let hasPreset = region.hasOwnProperty('tmfxPreset');
 		if (hasPreset) {
-			return template;
+			return region;
 		}
 		const settings = game.settings.get('tokenmagic', 'autoTemplateSettings');
-		let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), template) : false;
+		let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), region) : false;
 		if (!updated) {
-			fromCategories(settings.categories, template);
+			fromCategories(settings.categories, region);
 		}
 	}
 }
 
-function fromConfig(config, templateData) {
+function fromConfig(config, region) {
 	const o = { tokenmagic: { options: {} } };
 	if (config.preset && config.preset !== '' && config.preset !== emptyPreset) {
 		o.tokenmagic.options.tmfxPreset = config.preset;
@@ -132,26 +132,26 @@ function fromConfig(config, templateData) {
 		o.tokenmagic.options.tmfxTint = config.tint;
 	}
 	o.tokenmagic.options.tmfxRegionOpacity = config.opacity;
-	foundry.utils.mergeObject(templateData, { 'flags.tokenmagic': o.tokenmagic });
+	region.updateSource({ 'flags.tokenmagic': o.tokenmagic });
 }
 
-function fromOverrides(overrides = [], templateData) {
-	const name = templateData.flags.witcher?.origin?.name;
+function fromOverrides(overrides = [], region) {
+	const name = region.flags.witcher?.origin?.name;
 	let config = overrides.find((el) => el.target.toLowerCase() === name?.toLowerCase());
 	if (!config) {
 		return false;
 	}
-	fromConfig(config, templateData);
+	fromConfig(config, region);
 	return true;
 }
 
-function fromCategories(categories = {}, templateData) {
-	const traits = templateData.flags.witcher?.origin?.traits ?? [];
+function fromCategories(categories = {}, region) {
+	const traits = region.flags.witcher?.origin?.traits ?? [];
 
 	let config, dmgSettings;
 	for (const trait of traits) {
 		dmgSettings = categories[trait] || {};
-		config = dmgSettings[templateData.t];
+		config = dmgSettings[region.shapes[0].type];
 
 		if (config && config.preset !== emptyPreset) {
 			break;
@@ -164,7 +164,7 @@ function fromCategories(categories = {}, templateData) {
 
 	fromConfig(
 		foundry.utils.mergeObject(config, { opacity: dmgSettings.opacity, tint: dmgSettings.tint }, true, true),
-		templateData,
+		region,
 	);
 	return true;
 }

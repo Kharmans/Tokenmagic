@@ -1,4 +1,4 @@
-import { defaultOpacity, emptyPreset, TEMPLATE_TYPES } from '../../../module/constants.js';
+import { defaultOpacity, emptyPreset, TEMPLATE_REGION_TYPES } from '../../../module/constants.js';
 import { TemplateSettings } from './TemplateSettings.js';
 
 export class AutoTemplatePF2E extends TemplateSettings {
@@ -84,7 +84,7 @@ export class AutoTemplatePF2E extends TemplateSettings {
 				}
 				defaultConfig.categories[dmgType] = config;
 			}
-			TEMPLATE_TYPES.forEach((tplType) => {
+			TEMPLATE_REGION_TYPES.forEach((tplType) => {
 				const config = { preset: emptyPreset, texture: null };
 				switch (dmgType.toLowerCase()) {
 					case 'acid':
@@ -155,26 +155,26 @@ export class AutoTemplatePF2E extends TemplateSettings {
 			dmgTypes[type] = { label: type.charAt(0).toUpperCase() + type.slice(1) };
 		}
 		context.dmgTypes = dmgTypes;
-		context.templateTypes = TEMPLATE_TYPES;
+		context.templateTypes = TEMPLATE_REGION_TYPES;
 	}
 
-	preCreateRegion(template) {
-		let hasPreset = template.hasOwnProperty('tmfxPreset');
+	preCreateRegion(region) {
+		let hasPreset = region.hasOwnProperty('tmfxPreset');
 		if (hasPreset) {
-			return template;
+			return region;
 		}
 
-		const origin = template.flags?.pf2e?.origin;
+		const origin = region.flags?.pf2e?.origin;
 		const settings = game.settings.get('tokenmagic', 'autoTemplateSettings');
-		let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), origin, template) : false;
+		let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), origin, region) : false;
 		if (!updated) {
-			fromCategories(settings.categories, origin, template);
+			fromCategories(settings.categories, origin, region);
 		}
-		return template;
+		return region;
 	}
 }
 
-function fromConfig(config, template) {
+function fromConfig(config, region) {
 	const o = { tokenmagic: { options: {} } };
 	if (config.preset && config.preset !== '' && config.preset !== emptyPreset) {
 		o.tokenmagic.options.tmfxPreset = config.preset;
@@ -183,10 +183,10 @@ function fromConfig(config, template) {
 		o.tokenmagic.options.tmfxTint = config.tint;
 	}
 	o.tokenmagic.options.tmfxRegionOpacity = config.opacity;
-	template.updateSource({ flags: { tokenmagic: o.tokenmagic } });
+	region.updateSource({ flags: { tokenmagic: o.tokenmagic } });
 }
 
-function fromOverrides(overrides = [], origin, template) {
+function fromOverrides(overrides = [], origin, region) {
 	const { name, slug } = origin;
 
 	let configs = overrides.filter((el) => el.target.toLowerCase() === name?.toLowerCase());
@@ -195,22 +195,22 @@ function fromOverrides(overrides = [], origin, template) {
 	}
 	// if there are multiple overrides for the same item, the random one is chosen
 	let config = configs[Math.floor(Math.random() * configs.length)];
-	fromConfig(config, template);
+	fromConfig(config, region);
 	return true;
 }
 
-function fromCategories(categories = {}, origin, template) {
+function fromCategories(categories = {}, origin, region) {
 	if (!origin.traits?.length) {
 		return false;
 	}
 
 	let config, dmgSettings;
 
-	// some templates may have multiple traits
+	// some regions may have multiple traits
 	// this loop looks over all of them until it finds one with a valid fx preset
 	for (const trait of origin.traits) {
 		dmgSettings = categories[trait.toLowerCase()] || {};
-		config = dmgSettings[template.t]; // TODO regions have shapes not properties like .t
+		config = dmgSettings[region.shapes[0].type];
 
 		if (config && config.preset !== emptyPreset) {
 			break;
@@ -221,7 +221,7 @@ function fromCategories(categories = {}, origin, template) {
 	}
 	fromConfig(
 		foundry.utils.mergeObject(config, { opacity: dmgSettings.opacity, tint: dmgSettings.tint }, true, true),
-		template,
+		region,
 	);
 	return true;
 }

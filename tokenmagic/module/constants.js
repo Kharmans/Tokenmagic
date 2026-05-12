@@ -8,7 +8,7 @@ export const PlaceableType = {
 	REGION: foundry.canvas.placeables.Region.embeddedName,
 	NOT_SUPPORTED: null,
 };
-export const TEMPLATE_TYPES = [
+export const TEMPLATE_REGION_TYPES = [
 	foundry.data.RectangleShapeData.TYPE,
 	foundry.data.CircleShapeData.TYPE,
 	foundry.data.ConeShapeData.TYPE,
@@ -16,3 +16,9 @@ export const TEMPLATE_TYPES = [
 	foundry.data.LineShapeData.TYPE,
 	foundry.data.EmanationShapeData.TYPE,
 ];
+export const TEMPLATE_TO_REGION_TYPE = {
+	circle: foundry.data.CircleShapeData.TYPE,
+	cone: foundry.data.ConeShapeData.TYPE,
+	ray: foundry.data.LineShapeData.TYPE,
+	rect: foundry.data.RectangleShapeData.TYPE,
+};

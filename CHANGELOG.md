@@ -1,3 +1,7 @@
+# Token Magic FX - Update v0.8.1
+
+- Auto-template fixes
+
 # Token Magic FX - Update v0.8.0
 
 - v14 support

@@ -1,4 +1,9 @@
-import { defaultOpacity, emptyPreset, TEMPLATE_TYPES } from '../../../module/constants.js';
+import {
+	defaultOpacity,
+	emptyPreset,
+	TEMPLATE_REGION_TYPES,
+	TEMPLATE_TO_REGION_TYPE,
+} from '../../../module/constants.js';
 import { TemplateSettings } from './TemplateSettings.js';
 
 export class AutoTemplateDND5E extends TemplateSettings {
@@ -63,7 +68,7 @@ export class AutoTemplateDND5E extends TemplateSettings {
 				}
 				defaultConfig.categories[dmgType] = config;
 			}
-			TEMPLATE_TYPES.forEach((tplType) => {
+			TEMPLATE_REGION_TYPES.forEach((tplType) => {
 				const config = { preset: emptyPreset, color: null };
 				switch (dmgType.toLowerCase()) {
 					case 'acid':
@@ -139,7 +144,7 @@ export class AutoTemplateDND5E extends TemplateSettings {
 
 	_prepareCategoriesContext(context, options) {
 		context.dmgTypes = CONFIG.DND5E.damageTypes;
-		context.templateTypes = TEMPLATE_TYPES;
+		context.templateTypes = TEMPLATE_REGION_TYPES;
 	}
 }
 
@@ -195,7 +200,7 @@ function fromCategories(categories = {}, activity, template) {
 	// this loop looks over all the types until it finds one with a valid fx preset
 	for (const dmgType of dmgTypes) {
 		dmgSettings = categories[dmgType] || {};
-		config = dmgSettings[template.t];
+		config = dmgSettings[TEMPLATE_TO_REGION_TYPE[template.t]];
 
 		if (config && config.preset !== emptyPreset) {
 			break;
@@ -212,24 +217,29 @@ function fromCategories(categories = {}, activity, template) {
 }
 
 function fromActivity(wrapped, ...args) {
-	const [activity] = args;
-	const activityTemplates = wrapped(...args);
-	if (!activityTemplates) {
-		return activityTemplates;
-	}
-
-	for (const activityTemplate of activityTemplates) {
-		const template = activityTemplate.document;
-
-		let hasPreset = template.hasOwnProperty('tmfxPreset');
-		if (hasPreset) continue;
-
-		const settings = game.settings.get('tokenmagic', 'autoTemplateSettings');
-		let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), activity, template) : false;
-		if (!updated) {
-			fromCategories(settings.categories, activity, template);
+	try {
+		const [activity] = args;
+		const activityTemplates = wrapped(...args);
+		if (!activityTemplates) {
+			return activityTemplates;
 		}
+
+		for (const activityTemplate of activityTemplates) {
+			const template = activityTemplate.document;
+
+			let hasPreset = template.hasOwnProperty('tmfxPreset');
+			if (hasPreset) continue;
+
+			const settings = game.settings.get('tokenmagic', 'autoTemplateSettings');
+			let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), activity, template) : false;
+			if (!updated) {
+				fromCategories(settings.categories, activity, template);
+			}
+		}
+		return activityTemplates;
+	} catch (e) {
+		console.log(e);
 	}
 
-	return activityTemplates;
+	return wrapped(...args);
 }
