@@ -1836,7 +1836,8 @@ Hooks.on('deleteRegion', (_, document) => {
 
 Hooks.on('updateRegion', (document, options) => {
 	if (document.parent.id !== game.user.viewedScene) return;
-	let placeable = getPlaceableById(document._id, PlaceableType.REGION);
+	const placeable = document.object;
+	if (!placeable) return;
 
 	if (
 		options.flags?.tokenmagic instanceof foundry.data.operators.ForcedDeletion ||
@@ -1850,7 +1851,7 @@ Hooks.on('updateRegion', (document, options) => {
 		if (!placeable.loadingRequest) {
 			Magic._updateFilters(document, options, PlaceableType.REGION);
 
-			const sprite = getPlaceableById(document._id, PlaceableType.REGION)?._TMFXgetSprite();
+			const sprite = placeable._TMFXgetSprite();
 			if (sprite) {
 				const filters = document.getFlag('tokenmagic', 'filters');
 				if (filters) sprite.setShaderClass(foundry.canvas.rendering.shaders.RegionShader);

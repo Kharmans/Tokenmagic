@@ -1,3 +1,8 @@
+# Token Magic FX - Update v0.8.2
+
+- Fixed data migration scripts causing TMFX load failure
+- Fixed PF2e errors thrown during region creation
+
 # Token Magic FX - Update v0.8.1
 
 - Auto-template fixes

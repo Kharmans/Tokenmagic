@@ -1,6 +1,7 @@
 import { TokenMagic, isTheOne, log, warn, error } from '../module/tokenmagic.js';
 import { PresetsLibrary, templatePresets } from '../fx/presets/defaultpresets.js';
 import { defaultOpacity, TEMPLATE_TO_REGION_TYPE } from '../module/constants.js';
+import { TokenMagicSettings } from '../module/settings.js';
 
 const Magic = TokenMagic();
 
@@ -256,6 +257,12 @@ async function updatePresetsV050() {
 }
 
 async function updateTemplateSettingsV051() {
+	const templates = TokenMagicSettings.getSystemTemplates();
+	if (!templates) {
+		await game.settings.set('tokenmagic', 'migration', DataVersion.V051);
+		return;
+	}
+
 	const autoTemplateSettings = game.settings.get('tokenmagic', 'autoTemplateSettings');
 	if (foundry.utils.isEmpty(autoTemplateSettings)) return;
 

@@ -165,6 +165,7 @@ export class AutoTemplatePF2E extends TemplateSettings {
 		}
 
 		const origin = region.flags?.pf2e?.origin;
+		if (!origin) return;
 		const settings = game.settings.get('tokenmagic', 'autoTemplateSettings');
 		let updated = settings.overrides ? fromOverrides(Object.values(settings.overrides), origin, region) : false;
 		if (!updated) {
