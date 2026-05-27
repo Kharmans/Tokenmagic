@@ -23,6 +23,9 @@ const ROTATION_CONTROL = {
 	max: 360,
 	step: 0.5,
 };
+const BOOLEAN = {
+	type: 'boolean',
+};
 
 export const FILTER_PARAM_CONTROLS = {
 	common: {
@@ -79,9 +82,7 @@ export const FILTER_PARAM_CONTROLS = {
 		kernels: {
 			type: 'ignore',
 		},
-		alphaDiscard: {
-			type: 'boolean',
-		},
+		alphaDiscard: BOOLEAN,
 		alpha: ALPHA_CONTROL,
 		rotation: ROTATION_CONTROL,
 		padding: {
@@ -121,6 +122,32 @@ export const FILTER_PARAM_CONTROLS = {
 			max: 100,
 			step: 1,
 		},
+		sticky: BOOLEAN,
+	},
+	colorGradient: {
+		_thumb: 'modules/tokenmagic/gui/macros/images/46 - Tropical (colorGradient).webp',
+		angle: ROTATION_CONTROL,
+		maxColors: {
+			type: 'range',
+			min: 0,
+			max: 80,
+			step: 1,
+		},
+		type: {
+			type: 'select',
+			options: {
+				0: 'Linear',
+				1: 'Radial',
+				2: 'Conic',
+			},
+		},
+		replace: BOOLEAN,
+		stops: {
+			type: 'controlList',
+		},
+		'stops.offset': ALPHA_CONTROL,
+		'stops.color': COLOR_CONTROL,
+		'stops.alpha': ALPHA_CONTROL,
 	},
 	spriteMask: {
 		_thumb: 'modules/tokenmagic/gui/macros/images/45 - Star Mask (spriteMask).webp',
@@ -727,6 +754,7 @@ export const FILTER_PARAM_CONTROLS = {
 			step: 1,
 			animatable: false,
 		},
+		knockout: BOOLEAN,
 	},
 	sprite: {
 		_thumb: 'modules/tokenmagic/gui/macros/images/37 - T02 - Pentagram (sprite).webp',

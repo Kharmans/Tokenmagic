@@ -49,6 +49,7 @@ import './proto/CanvasDocumentProto.js';
 import { FilterCRT } from '../fx/filters/FilterCRT.js';
 import { FilterRGBSplit } from '../fx/filters/FilterRGBSplit.js';
 import { TokenMagicSettings } from './settings.js';
+import { FilterColorGradient } from '../fx/filters/FilterColorGradient.js';
 
 /*
 
@@ -70,6 +71,7 @@ export const FilterType = {
 	oldfilm: FilterOldFilm,
 	glow: FilterGlow,
 	outline: FilterOutline,
+	colorGradient: FilterColorGradient,
 	bevel: FilterBevel,
 	xbloom: FilterXBloom,
 	shadow: FilterDropShadow,
@@ -469,6 +471,7 @@ export function TokenMagic() {
 		for (const params of paramsArray) {
 			updateParams = false;
 			params.updateId = foundry.utils.randomID();
+			params.placeableId = document.id;
 
 			if (params.hasOwnProperty('randomized') && params.randomized) {
 				randomizeParams(params);
@@ -504,7 +507,6 @@ export function TokenMagic() {
 					params.enabled = true;
 				}
 
-				params.placeableId = document.id;
 				params.filterInternalId = foundry.utils.randomID();
 				params.filterOwner = game.data.userId;
 				params.placeableType = document._TMFXgetPlaceableType();
@@ -619,6 +621,7 @@ export function TokenMagic() {
 
 		for (const params of paramsArray) {
 			params.updateId = foundry.utils.randomID();
+			params.placeableId = document.id;
 
 			if (params.hasOwnProperty('randomized') && params.randomized) {
 				randomizeParams(params);

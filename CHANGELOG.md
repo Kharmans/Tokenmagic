@@ -1,3 +1,11 @@
+# Token Magic FX - Update v0.8.3
+
+- Fixed Drop Shadow Filter no longer rendering on Foundry version 14.363
+- Fixed filter updates failing due to incorrectly set placeableId
+- Updated community authored PIXI filters `v5.1.1` -> `v5.3.0`
+  - Added a new `knockout` option to OutlineFilter
+  - Added a new `ColorGradient` filter
+
 # Token Magic FX - Update v0.8.2
 
 - Fixed data migration scripts causing TMFX load failure

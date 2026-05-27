@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Tropical Gradient",
+        "library": "tmfx-main",
+        "params": [
+            {
+                "filterType": "colorGradient",
+                "filterId": "Tropical Gradient",
+                "rank": 10002,
+                "enabled": true,
+                "stops": [
+                {
+                    "offset": 0,
+                    "color": 13172480,
+                    "alpha": 0.58
+                },
+                {
+                    "offset": 1,
+                    "color": 64511,
+                    "alpha": 1
+                }
+                ],
+                "type": "0",
+                "alpha": 1,
+                "angle": 90,
+                "maxColors": 0,
+                "replace": false,
+                "sticky": true
+            }
+        ]
+    }
+]

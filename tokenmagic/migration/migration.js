@@ -17,6 +17,7 @@ export const DataVersion = {
 	V044: '0.4.4',
 	V050: '0.5.0',
 	V051: '0.5.1',
+	V052: '0.5.2',
 };
 
 const TEXTURE_MAPPINGS = {
@@ -70,6 +71,9 @@ export async function tmfxDataMigration() {
 		}
 		if (dataVersionNow < DataVersion.V051) {
 			await updateTemplateSettingsV051();
+		}
+		if (dataVersionNow < DataVersion.V052) {
+			await updatePresetsV052();
 		}
 	}
 }
@@ -297,5 +301,26 @@ async function updateTemplateSettingsV051() {
 	} catch (e) {
 		error(`Migration 0.5.1 - Auto-Template Migration failed.`);
 		error(e);
+	}
+}
+
+async function updatePresetsV052() {
+	var presets = game.settings.get('tokenmagic', 'presets');
+
+	if (!(presets == null)) {
+		log(`Migration 0.5.2 - Launching presets data migration...`);
+
+		try {
+			await game.settings.set('tokenmagic', 'presets', presets);
+			log(`Migration 0.5.2 - updating template presets...`);
+			await Magic.importPresetLibraryFromPath('modules/tokenmagic/import/TMFX-update-presets-v052.json', {
+				overwrite: true,
+			});
+			await game.settings.set('tokenmagic', 'migration', DataVersion.V052);
+			log(`Migration 0.5.2 - Migration successful!`);
+		} catch (e) {
+			error(`Migration 0.5.2 - Migration failed.`);
+			error(e);
+		}
 	}
 }

@@ -3,12 +3,19 @@ import './proto/FilterProto.js';
 
 export class FilterOutline extends PIXI.filters.OutlineFilter {
 	constructor(params) {
+		let { thickness, color, knockout } = Object.assign({}, FilterOutline.defaults, params);
+
 		super();
+
+		Object.assign(this, {
+			thickness,
+			color,
+			knockout,
+		});
+
 		this.blendMode = PIXI.BLEND_MODES.NORMAL;
 		this.padding = 5;
 		this.enabled = false;
-		this.thickness = 3;
-		this.color = 0x000000;
 		this.quality = 1;
 		this.zOrder = 50;
 		this.animated = {};
@@ -19,3 +26,9 @@ export class FilterOutline extends PIXI.filters.OutlineFilter {
 		}
 	}
 }
+
+FilterOutline.defaults = {
+	thickness: 3,
+	color: 0x000000,
+	knockout: false,
+};

@@ -779,7 +779,12 @@ class FilterEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 		for (const [param, value] of Object.entries(this._params)) {
 			const control = this.#genControl(param, value);
 			if (!control) continue;
-			controls.push(control);
+			if (control.type === 'controlList') {
+				control.list.forEach((c) => {
+					controls.push(c);
+					this._paramControls[c.name] = c;
+				});
+			} else controls.push(control);
 			this._paramControls[param] = control;
 		}
 		controls.sort((c1, c2) => (c1.order ?? 0) - (c2.order ?? 0));
@@ -851,6 +856,22 @@ class FilterEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
 		if (control.type === 'ignore') return null;
 
+		if (control.type === 'controlList') {
+			control.list = [];
+			value.forEach((obj, i) => {
+				for (const [k, v] of Object.entries(obj)) {
+					const childControl = this.#genControl(`${param}.${k}`, v);
+					childControl.name = `${param}.${i}.${k}`;
+					childControl.label = genLabel(k);
+					childControl.group = `${param} [${i}]`;
+					childControl.animatable = false;
+					childControl.randomizable = false;
+					control.list.push(childControl);
+				}
+			});
+			return control;
+		}
+
 		// Is control animatable
 		if (control.type === 'range' || control.type === 'number' || control.type === 'color') {
 			if (!('animatable' in control)) control.animatable = true;
@@ -886,6 +907,15 @@ class FilterEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 		for (const [param, value] of Object.entries(params)) {
 			const control = this._paramControls[param];
 			if (control.type === 'color') params[param] = Number(Color.fromString(value));
+			else if (control.type === 'controlList') {
+				params[param] = Object.values(value).map((obj, i) => {
+					for (const [p, v] of Object.entries(obj)) {
+						const control = this._paramControls[`${param}.${i}.${p}`];
+						if (control.type === 'color') obj[p] = Number(Color.fromString(v));
+					}
+					return obj;
+				});
+			}
 		}
 
 		Object.assign(params, this._filterIdentifier);
